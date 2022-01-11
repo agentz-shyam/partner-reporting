@@ -53,7 +53,7 @@ class reportingMethod:
                                    passwd=configFile["analysis"]["pswd"], db=self.businessDB)
 
         self.cur3 = self.db3.cursor()
-        self.ETL = ETL_verification(env)
+        # self.ETL = ETL_verification(env)
 
     def business_id(self, timezones):
         self.Date = dt.datetime.today().date() - dt.timedelta(4)

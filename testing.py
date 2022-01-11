@@ -53,7 +53,7 @@ class reportingMethod:
                                    passwd=configFile["analysis"]["pswd"], db=self.businessDB)
 
         self.cur3 = self.db3.cursor()
-        self.ETL = ETL_verification(env)
+        # self.ETL = ETL_verification(env)
         self.my_timezone = timezone(timezones)
         timeZoneQuery = "SELECT business_id FROM business_agent_mapping WHERE timezone = '{}'"
         self.cur3.execute(timeZoneQuery.format(str(self.my_timezone)))
