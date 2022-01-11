@@ -1,0 +1,22 @@
+   <body>
+      <center>
+         <h2 style="">ETL process verification summary</h2>
+      </center>
+      <p>ETL Date : {date} </p>
+      <p style="font-size: 20px;line-height: 28px;">Status:</p>
+      <ul style="color:black;margin-top: -12px;">
+         <li> Total active businesses   : {active}</li>
+         <li> ETL successfully executed : {success}</li>
+         <li> ETL failed : {failed}</li>
+      </ul>
+      <p style="font-size: 20px;line-height: 28px;">ETL Failed for the following businesses (Investigation needed):</p>
+      <ol style="color:black;margin-top: -12px;">
+         {failedBusiness}
+      </ol>
+      <p>Any count which is more than +- 25% of its previous day's value will be considered as abnormal and marked for investigation. </p>
+      <p style="font-size: 20px;line-height: 28px;">Abnormal counts detected for the following  - Investigation recommended:</p>
+      <ol style="color:black;margin-top: -12px;">
+         {abnormalCounts}
+      </ol>
+   </body>
+</html>

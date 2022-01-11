@@ -1,0 +1,8 @@
+Charting Module
+
+Dev API endpoint: https://9usqtruj1h.execute-api.us-east-2.amazonaws.com/chartvalues
+Prod API endpoint: https://lltfqtooxd.execute-api.us-east-2.amazonaws.com/chartvalues/
+
+Settings Module
+Dev API endpoint: https://8m8uztfm96.execute-api.us-east-2.amazonaws.com/settings/
+Prod API endpoint: https://m2pojnu33m.execute-api.us-east-2.amazonaws.com/settings/
