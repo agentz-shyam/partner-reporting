@@ -70,3 +70,5 @@ eventsQuery = '''
         and created_date <= '{}'
         order by created_date asc;
     ''' 
+
+deleteFailedEntriesQuery = "DELETE FROM {} where id = '{}' and reporting_date = '{}'"    

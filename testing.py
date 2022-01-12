@@ -159,6 +159,8 @@ class reportingMethod:
                     logger.info(message)
                     self.cur2.execute("INSERT INTO `report_event` VALUES {}".format(tuple(message)))
                     self.db2.commit()
+                    if self.status == "FAILED":
+                        self.deleteFailedEntries()
                     # self.db1.close()
                     # self.db2.close()
                     # self.db3.close()
@@ -167,7 +169,6 @@ class reportingMethod:
                     logger.info(f"Error while inserting report event data {e}")    
 
     def report_generation(self):
-        try:
             self.data = {
                 'start': str(self.Date),
                 'end': str(self.Date),
@@ -175,8 +176,8 @@ class reportingMethod:
                 'type': "api",
                 'timezone': str(self.my_timezone)
             }
-            self.url = "http://0.0.0.0:9091/report"
-            # self.url = "http://192.168.1.4:9091/report"
+            # self.url = "http://0.0.0.0:9091/report"
+            self.url = "http://192.168.1.4:9091/report"
 
             logger.info(f"Invoking an API call to url {self.url} with body {self.data}")
             response = requests.post(url=self.url, data=self.data)
@@ -186,11 +187,9 @@ class reportingMethod:
             if (response.status_code) != 500:
                 self.statistics = response.json()
             return self.statistics
-        except Exception as e:
-            logger.info('Error While Fetching data from analysis API  {e}')    
+
 
     def Task2id(self, ):
-        try:
             self.cur2.execute(util.agentDomainId.format(self.row[2]))
             self.agentDomainId = list(self.cur2.fetchall())
             self.taskApi = "https://" + env + configFile["charting"]["taskAPi"] + self.agentDomainId[0][0] + "/tasks"
@@ -205,11 +204,9 @@ class reportingMethod:
                     logger.info("Task Details sucessfully fetched from API")                
             else:
                 logger.info("Task API request failed")         
-        except Exception as e:
-            logger.info(f"Error while getting data from task API - {e}")    
+   
 
     def statistics_entry(self, ):
-        try:
             self.cur2.execute("SHOW COLUMNS FROM `statistics_value`")
             self.columnName = [name[0] for name in list(self.cur2.fetchall())]
             valuesList = [self.id, str(self.Date)]
@@ -221,12 +218,10 @@ class reportingMethod:
             self.cur2.execute("INSERT INTO `statistics_value` values {}".format(tuple(valuesList)))
             self.db2.commit()
             logger.info("statistics_entry : Done")
-        except Exception as e:
-            logger.info(f" Error while Inserting row to statistics table - {e}")
+
 
 
     def task_count(self, ):
-        try:
             if self.statistics['taskNumber']:
                 for task in self.statistics['taskNumber']:
                     try:
@@ -240,12 +235,10 @@ class reportingMethod:
                 logger.info(f"Sucessfully inserted taskcount details : No of tasks inserted {len(self.statistics['taskNumber'])}")
             else:
                 logger.info("No task executed for this business chatbot")    
-        except Exception as e:
-            logger.info(f"Error while inserting row to task count table - {e}")
+
 
 
     def exiting_task(self):
-        try:  
             if self.statistics['exit_tasks_list']:      
                 for exitTask in self.statistics['exit_tasks_list']:
                     try:
@@ -258,13 +251,10 @@ class reportingMethod:
                     self.db2.commit()
                 logger.info(f"Sucessfully inserted exit task details : No of exit tasks inserted {len(self.statistics['exit_tasks_list'])}")
             else:
-                logger.info("No exit tasks for this business chatbot")  
+                logger.info("No exit tasks for this business chatbot") 
 
-        except Exception as e:
-            logger.info(f"Error while inserting row to existing task table - {e}")                
 
     def middle_exit(self, ):
-        try:
             if self.statistics['dropTaskNumber']:
                 for dropTask in self.statistics['dropTaskNumber']:
                     try:
@@ -279,12 +269,8 @@ class reportingMethod:
             else:
                 logger.info("No middle exits for this business chatbot") 
 
-        except Exception as e:
-            logger.info(f"Error while inserting row to middle exit table - {e}")
-
 
     def bounce_rate(self):
-        try:
             if self.statistics['rate']:
                 for bounceTask, bouncevalue in self.statistics['rate'].items():
                     try:
@@ -299,11 +285,10 @@ class reportingMethod:
             else:
                 logger.info("No bounce rate for this chatbot")
 
-        except Exception as e:
-            logger.info(f"Error while inserting row to bounce rate table - {e}")               
+            
 
     def sessions_timezone(self, ):
-        try:
+
             if self.statistics['sessionCount']:
                 for sessions in self.statistics['sessionCount']:
                     taskList = [self.id, str(self.Date), sessions.split(',')[0], sessions.split(',')[1]]
@@ -312,12 +297,9 @@ class reportingMethod:
                 logger.info("Sucessfully inserted session timezone details")
             else:
                 logger.info("No sessions for this business in this timezone")
-
-        except Exception as e:
-            logger.info(f"Error while inserting row to sessions timezone table - {e}")              
+            
 
     def phonecall_os(self, ):
-        try:
             if self.statistics['osCount']:
                 for osCount in self.statistics['osCount']:
                     taskList = [self.id, str(self.Date), osCount.split(',')[0], osCount.split(',')[1],
@@ -327,22 +309,19 @@ class reportingMethod:
                 logger.info("Sucessfully inserted phone call os details")
             else:
                 logger.info("No phone call os details")
-        except Exception as e:
-                logger.info(f"Error while inserting row to phone call os table - {e}") 
+
 
 
     def multiple_channel_performance(self, ):
-        try :
             for key,data in self.multiple_channel_performance_data.items():   
                 taskList = [self.id, str(self.Date), key, data['sessions'],data['discardedSessions'], data['engagement'], data['offHourEngagement'], data['contacts']]
                 self.cur2.execute("INSERT INTO `multi_channel_performance` values {}".format(tuple(taskList)))
                 self.db2.commit()
             logger.info("Inserted Multiple channel engagement details")
-        except Exception as e:
-            logger.info(f"Error while inserting row to multiple channel performance table - {e}")          
+         
 
     def engagement(self):
-        try:
+        
             self.fingerPrints = self.statistics['engagement']["Finger Print"]
             self.cur2.execute(util.userFlag, (self.row[2],))
             self.existingFingerPrint = [tableFingerprint[0] for tableFingerprint in list(self.cur2.fetchall())]
@@ -364,25 +343,33 @@ class reportingMethod:
                 self.db2.commit()
 
             logger.info("Engagement : Done") 
-        except Exception as e:
-            logger.info(f"Error while inserting row to engagement table - {e}")   
+  
 
     def concurrent_session(self):
-        try:
             if self.statistics['simultaneousDayLine']:
                 for concurrentSession in self.statistics['simultaneousDayLine'].values():
                     taskList = [self.id, str(self.Date), concurrentSession[0].split(',')[0],
                                 concurrentSession[0].split(',')[1]]
                     self.cur2.execute("INSERT INTO `concurrent_session` values {}".format(tuple(taskList)))
                     self.db2.commit()
-        except Exception as e:
-            logger.info(f"Error while inserting row to concurrent session - {e}")
+            else:
+                logger.info("No Concurrent session details")        
 
+
+    def deleteFailedEntries(self):
+            tables = ['bounce_rate','engagement','exiting_task','middle_exit','statistics_value','multi_channel_performance','phonecall_os','sessions_timezone','task_count']        
+            for table in tables:
+                deleteStatus = self.cur2.execute(util.deleteFailedEntriesQuery.format(table, self.id, str(self.Date)))
+                self.db2.commit()
+                if deleteStatus :
+                    logger.info(f"Failed Entries for {table} deleted for id - {self.id} in date - {str(self.Date)}")
+                else:
+                    logger.info(f"No Failed Entries for {table}")         
 
 for timezones in timezone_list['TimeZone']:
     reporting = reportingMethod(timezones)
     base = dt.datetime.today().date() - dt.timedelta(days=1)
-    date_list = [base - dt.timedelta(days=x) for x in range(71)]
+    date_list = [base - dt.timedelta(days=x) for x in range(1)]
     for date in date_list:
         try:
             logger.info("Process initiated for {}".format(date))
